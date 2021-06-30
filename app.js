@@ -1,5 +1,15 @@
 const puppeteer = require('puppeteer');
+const express = require('express');
+const fs = require('fs');
+const fetch = require('node-fetch');
 require('dotenv').config()
+
+
+const server = express();
+
+
+server.get('/', function(req, res) {
+
 
 const chromeOptions = {
   slowMo: 90,
@@ -43,27 +53,31 @@ async function bot(){
     const ListAllDetails = [...allDetails]
 
     const resultTitles = ListTitles.map((title) =>  String(title.innerText));
-    const resultValues = ListValues.map((value) =>  String("Valor:"+value.innerText));
+    const resultValues = ListValues.map((value) =>  String(value.innerText));
     const resultBids = ListBids.map((bid) =>  String(bid.innerText));
-    const resultDetails = ListAllDetails.map((detail) =>  String("Detalhes:"+detail.innerText));
+    const resultDetails = ListAllDetails.map((detail) =>  String(detail.innerText));
 
     
 
     return {resultTitles,resultValues,resultBids,resultDetails}
     });
 
-    let result =[]
+    var result = ' '
     for(let i=0; i<= listValues.resultTitles.length;i++){
       if(listValues.resultTitles[i] !== 'Titulo:'){
-        result.push(`Titulo: ${listValues.resultTitles[i]} \n\n ${listValues.resultTitles[i+1]} \n\n Valor: ${listValues.resultValues[i]} \n\n Propostas: ${listValues.resultBids[i]} \n\n Detalhes: ${listValues.resultDetails[i]} \n\n`)
+        result += `<div>Titulo: ${listValues.resultTitles[i]} <br/> ${listValues.resultTitles[i+1]} <br/> Valor: ${listValues.resultValues[i]} <br/> Propostas: ${listValues.resultBids[i]} <br/> Detalhes: ${listValues.resultDetails[i]} <br/><br/></div><hr/>`
       }
     }
 
-
-    console.log(result)
-
-    await browser.close();
+  
+    res.send(result)
+    //await browser.close();
 }
+
 
 bot()
 
+})
+
+
+server.listen(process.env.PORT, () => console.log('rodando'))
